@@ -1,0 +1,26 @@
+version: "3.3"
+
+services:
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.8.0
+    hostname: "filebeat.ccs.org"
+    user: root
+    volumes:
+      - ./config/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml
+      - filebeat:/usr/share/filebeat/data
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers/:/var/lib/docker/containers/:ro
+      - /var/log/:/var/log/:ro
+      - /var/log/audit/:/var/log/audit/:ro
+    environment:
+      - ELASTICSEARCH_HOST="http://192.168.1.5:9200"
+      - KIBANA_HOST="http://192.168.1.5:5601"
+    # disable strict permission checks
+    command: ["--strict.perms=false"]
+
+volumes:
+  filebeat:
+
+configs:
+  fb_config:
+    file: ./config/filebeat.docker.yml
